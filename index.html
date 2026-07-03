@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Nova Rush</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="gameShell">
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="hud" class="hud">
+      <div class="brand">
+        <div class="brand-title">NOVA RUSH</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <span>СЧЕТ</span>
+          <strong id="scoreText">0</strong>
+        </div>
+        <div id="waveCard" class="stat-card wave-card">
+          <span>ВОЛНА</span>
+          <strong id="waveText">1</strong>
+        </div>
+        <div class="stat-card wave-count-card">
+          <span id="waveCountLabel">ВРАГИ</span>
+          <strong id="waveCountText">0/12</strong>
+        </div>
+        <div class="stat-card mod-card">
+          <span>РЕЖИМ</span>
+          <strong id="modText">—</strong>
+        </div>
+      </div>
+
+      <div class="bars">
+        <div class="bar-wrap">
+          <div class="bar-label"><span>ЩИТ</span><b id="hpText">100%</b></div>
+          <div class="bar"><div id="hpBar" class="bar-fill hp"></div></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-label"><span>DASH</span><b id="dashText">READY</b></div>
+          <div class="bar"><div id="dashBar" class="bar-fill dash"></div></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-label"><span>OVERDRIVE</span><b id="overdriveText">0%</b></div>
+          <div class="bar"><div id="overdriveBar" class="bar-fill overdrive"></div></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-label"><span>LASER</span><b id="laserText">READY</b></div>
+          <div class="bar"><div id="laserBar" class="bar-fill laser"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="bossHud" class="boss-hud">
+      <div class="boss-hud-head">
+        <span id="bossNameText">BOSS</span>
+        <b id="bossPhaseText">CORE INTEGRITY</b>
+      </div>
+      <div class="boss-bar-frame">
+        <div id="bossHpBar" class="boss-hp-fill"></div>
+      </div>
+    </div>
+
+    <button id="pauseBtn" class="pause-btn" type="button" aria-label="Пауза">Пауза</button>
+
+    <div id="pauseOverlay" class="center-overlay pause-overlay">
+      <div class="panel pause-panel">
+        <h1>Пауза</h1>
+        <div class="pause-actions">
+          <button id="resumeBtn" type="button">Продолжить</button>
+          <button id="pauseSettingsBtn" type="button">Настройки</button>
+          <button id="pauseControlsBtn" type="button">Управление</button>
+          <button id="menuBtn" type="button">В меню</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="centerOverlay" class="center-overlay show">
+      <div class="panel menu-panel">
+        <div id="menuHomeScreen" class="menu-screen is-active">
+          <section class="menu-block title-block home-title-block">
+            <h1>NOVA RUSH</h1>
+          </section>
+
+          <section class="menu-block home-actions-block">
+            <div class="menu-home-buttons">
+              <button id="playMenuBtn" class="menu-primary" type="button">Играть</button>
+              <button id="customizeBtn" type="button">Кастомизация</button>
+              <button id="settingsBtn" type="button">Настройки</button>
+              <button id="controlsBtn" type="button">Управление</button>
+              <button id="creditsBtn" type="button">Credits</button>
+            </div>
+          </section>
+        </div>
+
+        <div id="menuPlayScreen" class="menu-screen">
+          <section class="menu-block play-title-block">
+            <div class="block-label">Выбор режима</div>
+            <h2>Режим забега</h2>
+          </section>
+
+          <section class="menu-block modes-block play-modes-block">
+            <div id="modeSelect" class="mode-select">
+              <button data-mode="classic" class="mode-btn active"><strong>Classic</strong><span>волны, апгрейды, боссы</span></button>
+              <button data-mode="rush" class="mode-btn"><strong>Survival</strong><span>рекорд по времени</span></button>
+              <button data-mode="boss" class="mode-btn"><strong>Rift</strong><span>закрывай разломы</span></button>
+              <button data-mode="onehp" class="mode-btn"><strong>One HP</strong><span>одна ошибка</span></button>
+              <button data-mode="zen" class="mode-btn"><strong>Zen</strong><span>свободный режим, бессмертие</span></button>
+            </div>
+            <div id="modeDescription" class="mode-description">
+              <b>Classic</b> — основной режим: волны врагов, апгрейды и босс каждые 5 волн.
+            </div>
+            <div id="recordsPanel" class="records-panel"></div>
+            <div class="menu-actions play-actions">
+              <button id="backToMainBtn" type="button" class="secondary-btn">Назад</button>
+              <button id="startBtn" class="menu-primary" type="button">Начать</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div id="upgradeOverlay" class="center-overlay upgrade-overlay">
+      <div class="panel upgrade-panel">
+        <div class="panel-small">CORE MODULE</div>
+        <h1>ВЫБОР МОДУЛЯ</h1>
+        <div id="upgradeChoices" class="upgrade-choices"></div>
+      </div>
+    </div>
+
+
+    <div id="settingsOverlay" class="center-overlay settings-overlay">
+      <div class="panel settings-panel">
+        <h1>Настройки</h1>
+        <div class="settings-group">
+          <label>Качество эффектов</label>
+          <div class="segmented" id="effectsSelect">
+            <button data-quality="low" type="button">Low</button>
+            <button data-quality="medium" type="button">Medium</button>
+            <button data-quality="high" type="button">High</button>
+          </div>
+        </div>
+        <div class="settings-group setting-line">
+          <span>Тряска экрана</span>
+          <button id="shakeToggle" class="toggle-btn" type="button">Вкл</button>
+        </div>
+        <div class="settings-group setting-line">
+          <span>Звук</span>
+          <button id="soundToggle" class="toggle-btn" type="button">Вкл</button>
+        </div>
+        <div class="settings-group setting-line">
+          <span>Полноэкранный режим</span>
+          <button id="fullscreenToggle" class="toggle-btn" type="button">Вкл</button>
+        </div>
+        <button id="settingsCloseBtn" type="button" class="settings-close">Закрыть</button>
+      </div>
+    </div>
+
+
+    <div id="customizeOverlay" class="center-overlay customize-overlay">
+      <div class="panel customize-panel">
+        <h1>Кастомизация</h1>
+        <div class="settings-group">
+          <label>Скины для ядра</label>
+          <div id="skinSelect" class="skins-grid"></div>
+          <div id="skinHint" class="skin-hint">Скины открываются за достижения и не влияют на баланс.</div>
+        </div>
+        <button id="customizeCloseBtn" type="button" class="settings-close">Закрыть</button>
+      </div>
+    </div>
+
+    <div id="controlsOverlay" class="center-overlay controls-overlay">
+      <div class="panel controls-panel">
+        <h1>Управление</h1>
+        <div class="controls-sheet">
+          <div class="controls-row"><b>Курсор</b><span>Вести ядро</span></div>
+          <div class="controls-row"><b>ЛКМ</b><span>Dash</span></div>
+          <div class="controls-row"><b>SPACE</b><span>Laser</span></div>
+          <div class="controls-row"><b>E</b><span>Overdrive</span></div>
+          <div class="controls-row"><b>R</b><span>Рестарт</span></div>
+          <div class="controls-row"><b>Q</b><span>Качество эффектов</span></div>
+          <div class="controls-row"><b>P / ESC</b><span>Пауза</span></div>
+        </div>
+        <button id="controlsCloseBtn" type="button" class="settings-close">Закрыть</button>
+      </div>
+    </div>
+
+    <div id="creditsOverlay" class="center-overlay credits-overlay">
+      <div class="panel credits-panel">
+        <h1>Credits</h1>
+        <p class="credits-signature">Bluecheck</p>
+        <button id="creditsCloseBtn" type="button">Закрыть</button>
+      </div>
+    </div>
+
+    <div id="mobileControls" class="mobile-controls">
+      <div class="mobile-left">
+        <div id="stickZone" class="stick-zone"><div id="stickKnob" class="stick-knob"></div></div>
+      </div>
+      <div class="mobile-right">
+        <button id="laserMobile" class="mobile-action laser-action" type="button">LASER</button>
+        <button id="overdriveMobile" class="mobile-action overdrive-action" type="button">OVER</button>
+        <button id="dashMobile" class="mobile-action dash-action" type="button">DASH</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
